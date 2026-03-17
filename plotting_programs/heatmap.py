@@ -6,11 +6,14 @@ from bubble_tools import E_constv
 
 # Grid
 
-R = 1e3
+R = 1e-3
 Z_min = 10**-12 * R**-4
 Z_max = R**-4
-m_vals = np.logspace(- np.log10(R), 9 - np.log10(R), 300)
-gamma_vals = np.logspace(0, 12, 300)
+m_min = - np.log10(R)
+m_max = 9 - np.log10(R)
+gamma_max = np.log10(10**15 * R)
+m_vals = np.logspace(m_min, m_max, 300)
+gamma_vals = np.logspace(0, gamma_max, 300)
 
 M, G = np.meshgrid(m_vals, gamma_vals)
 J_0 = 1/(10**16 * R**4)
