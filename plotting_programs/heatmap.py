@@ -82,7 +82,7 @@ ax.set_title(rf"$\Lambda = 10^{{{-np.log10(R):.0f}}}$ GeV")
 # Choose positions that you can tune if needed
 # Labels fixed relative to the plot window, not the data
 ax.text(
-    0.03, 0.92, "overshoot",
+    0.03, 0.92, "overproduced",
     transform=ax.transAxes,
     color="orange",
     fontsize=10,
@@ -106,7 +106,7 @@ ax.text(
 
 # Relativistic / non-relativistic line
 
-T_bbn = 1e-3   # choose the value you want
+T_bbn = 1e-3   # BBN temperature
 
 gamma_line = 1/(T_bbn * R)
 
