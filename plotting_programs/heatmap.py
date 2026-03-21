@@ -7,23 +7,26 @@ from bubble_tools import E_constv
 # Grid
 
 R = 1e-3
-Z_min = 10**-12 * R**-4
-Z_max = R**-4
-m_min = - np.log10(R)
-m_max = 9 - np.log10(R)
+rho_min = 35.1 * 10**-9 * R**-4
+rho_max = 35.1 * R**-4
+m_min = - 3 - np.log10(R)
+m_max = 6 - np.log10(R)
 gamma_max = np.log10(10**15 * R)
 m_vals = np.logspace(m_min, m_max, 300)
 gamma_vals = np.logspace(0, gamma_max, 300)
+beta_gw = 10**-15 * R**-2
 
 M, G = np.meshgrid(m_vals, gamma_vals)
 J_0 = 1/(10**16 * R**4)
 
-Z = E_constv(1e-9 * M, R * G, G, J_0)
-
+rho = E_constv(1e-9 * M, R * G, G, J_0) * beta_gw**3
+fraction_rho = rho / rho_max
+fraction_rho_min = rho_min / rho_max
 
 # Main heatmap only in the wanted range
 
-Z_main = np.ma.masked_where((Z < Z_min) | (Z > Z_max) | (Z <= 0), Z)
+rho_main = np.ma.masked_where(
+    (fraction_rho < fraction_rho_min) | (fraction_rho > 1) | (fraction_rho <= 0), fraction_rho)
 
 cmap = plt.get_cmap("viridis").copy()
 cmap.set_bad("white")
@@ -33,36 +36,36 @@ fig, ax = plt.subplots(figsize=(8, 6))
 pcm = ax.pcolormesh(
     M,
     G,
-    Z_main,
+    rho_main,
     shading="auto",
     cmap=cmap,
-    norm=LogNorm(vmin=Z_min, vmax=Z_max)
+    norm=LogNorm(vmin=fraction_rho_min, vmax=1)
 )
 
 cbar = plt.colorbar(pcm, ax=ax)
-cbar.set_label(r"$E$ (GeV)")
+cbar.set_label(r"$\epsilon/\rho_{\rm r}$")
 
 
-# Hatched region: Z > Z_max  -> overshoot
+# Hatched region: fraction_rho > 1  -> overproduced
 
-if np.nanmax(Z) > Z_max:
+if np.nanmax(fraction_rho) > 1:
     cf_over = ax.contourf(
-        M, G, Z,
-        levels=[Z_max, np.nanmax(Z)],
+        M, G, fraction_rho,
+        levels=[1, np.nanmax(fraction_rho)],
         colors="none",
         hatches=["\\\\\\"]
     )
     cf_over.set_edgecolor("orange")
 
 
-# Hatched region: 0 < Z < Z_min  -> negligible
+# Hatched region: 0 < fraction_rho < fraction_rho_min  -> negligible
 
-Z_pos = np.where(Z > 0, Z, np.nan)
-min_pos = np.nanmin(Z_pos)
+rho_pos = np.where(fraction_rho > 0, fraction_rho, np.nan)
+min_pos = np.nanmin(rho_pos)
 
 cf_under = ax.contourf(
-    M, G, Z_pos,
-    levels=[np.nanmin(Z_pos), Z_min],
+    M, G, rho_pos,
+    levels=[np.nanmin(rho_pos), fraction_rho_min],
     colors="none",
     hatches=["\\\\\\"]
 )
@@ -73,8 +76,8 @@ cf_under.set_edgecolor("blue")
 
 ax.set_xscale("log")
 ax.set_yscale("log")
-ax.set_xlabel(r"$m$ (eV)")
-ax.set_ylabel(r"$\gamma$")
+ax.set_xlabel(r"$m_a$ (eV)")
+ax.set_ylabel(r"$\gamma_{\rm term}$")
 ax.set_title(rf"$\Lambda = 10^{{{-np.log10(R):.0f}}}$ GeV")
 
 
