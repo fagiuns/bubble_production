@@ -24,6 +24,6 @@ def E_constv(m, R, gamma, J_0):
     return np.pi * J_0**2 * (B + np.exp(-2 * u) * A) / (6 * m**5 * gamma**3)
 
 
-def E_speed_of_lightT(m, R, T):
+def E_speed_of_lightT(m, R, tau):
 
-    return (np.pi * T**2 * (4 * R**3 + 6 * R**2 * T + 6 * R * T**2 + 3 * T**3)) / (6 + 6 * m**2 * T**2)
+    return (np.pi * tau**2 * (4 * R**3 + 6 * R**2 * tau + 6 * R * tau**2 + 3 * tau**3)) / (6 + 6 * m**2 * tau**2)
